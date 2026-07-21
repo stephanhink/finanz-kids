@@ -150,9 +150,17 @@ export function yahooTicker(lieferMonat, lieferJahr) {
   return `CL${code}${kurzJahr}.NYM`;
 }
 
-// Liste der nächsten `anzahl` NYMEX-WTI-Kontraktmonate, deren Options-
-// Verfallsdatum noch in der Zukunft liegt, aufsteigend sortiert.
-export function naechsteKontrakte(anzahl = 24) {
+// Nur die vier Quartalsmonate (wie beim klassischen Futures-Zyklus) —
+// weniger Auswahl, dafür reicht die Liste über deutlich mehr Jahre.
+const QUARTALSMONATE = [2, 5, 8, 11]; // März, Juni, September, Dezember
+
+// Liste der nächsten `anzahl` NYMEX-WTI-Quartalskontrakte, deren Options-
+// Verfallsdatum noch in der Zukunft liegt, aufsteigend sortiert. Bei sehr
+// weit entfernten März-/September-Terminen (ca. ab 2029) listet die
+// NYMEX teils nur noch Juni/Dezember — Yahoo liefert dafür dann keinen
+// Kurs, die App fängt das mit der bestehenden Fehlermeldung ab und lässt
+// manuelle Eingabe zu.
+export function naechsteKontrakte(anzahl = 20) {
   const heute = new Date();
   heute.setHours(0, 0, 0, 0);
 
@@ -160,8 +168,8 @@ export function naechsteKontrakte(anzahl = 24) {
   let monat = heute.getMonth();
   let jahr = heute.getFullYear();
 
-  // etwas weiter zurückstarten, falls der aktuelle Monat schon verfallen ist
-  for (let i = -1; kontrakte.length < anzahl; i++) {
+  // etwas weiter zurückstarten, falls der aktuelle Quartalsmonat schon verfallen ist
+  for (let i = -3; kontrakte.length < anzahl; i++) {
     let m = monat + i;
     let j = jahr;
     while (m < 0) {
@@ -172,6 +180,8 @@ export function naechsteKontrakte(anzahl = 24) {
       m -= 12;
       j += 1;
     }
+    if (!QUARTALSMONATE.includes(m)) continue;
+
     const verfallsdatum = optionsVerfallsdatum(m, j);
     if (verfallsdatum > heute) {
       kontrakte.push({
