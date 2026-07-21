@@ -2,25 +2,6 @@ name: EAS Build
 
 on:
   workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Für welche Plattform bauen?'
-        required: true
-        default: android
-        type: choice
-        options:
-          - android
-          - ios
-          - all
-      profile:
-        description: 'EAS Build-Profil (aus eas.json)'
-        required: true
-        default: production
-        type: choice
-        options:
-          - production
-          - preview
-          - development
 
 jobs:
   build:
@@ -44,5 +25,5 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm ci
 
-      - name: EAS Build starten
-        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive --wait
+      - name: EAS Build starten (Android, Production, AAB)
+        run: eas build --platform android --profile production --non-interactive --wait
