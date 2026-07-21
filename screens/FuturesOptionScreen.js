@@ -17,6 +17,7 @@ import { binomialFuturesOption } from '../utils/binomialFutures';
 import { tageBisDatum } from '../utils/datum';
 import { naechsteKontrakte } from '../utils/nymexKontrakte';
 import { holeKurs } from '../utils/yahooFinance';
+import { impliziteVolatilitaet } from '../utils/impliedVol';
 import { holeUsZinskurve, interpoliereZins } from '../utils/zinskurve';
 
 function zahl(text) {
@@ -40,6 +41,9 @@ export default function FuturesOptionScreen() {
   const [volatilitaet, setVolatilitaet] = useState('35');
   const [zinssatz, setZinssatz] = useState('4');
   const [optionsTyp, setOptionsTyp] = useState('call');
+
+  const [modus, setModus] = useState('vola'); // 'vola' | 'marktpreis'
+  const [marktpreis, setMarktpreis] = useState('6.50');
 
   const [zinskurve, setZinskurve] = useState(null);
   const [wtiLaedt, setWtiLaedt] = useState(false);
@@ -100,8 +104,29 @@ export default function FuturesOptionScreen() {
   const F = zahl(futuresPreis);
   const K = zahl(basispreis);
   const T = tageBisVerfall / 365;
-  const sigma = zahl(volatilitaet) / 100;
   const r = zahl(zinssatz) / 100;
+
+  let sigma;
+  let implizierteVolaFehler = null;
+  if (modus === 'marktpreis') {
+    const geloest = impliziteVolatilitaet({
+      F,
+      K,
+      T,
+      r,
+      marktpreis: zahl(marktpreis),
+      optionsTyp,
+    });
+    if (geloest === null) {
+      implizierteVolaFehler =
+        'Kein gültiges σ gefunden — Marktpreis liegt unter dem inneren Wert oder ist unrealistisch hoch.';
+      sigma = 0;
+    } else {
+      sigma = geloest;
+    }
+  } else {
+    sigma = zahl(volatilitaet) / 100;
+  }
 
   const { call: b76Call, put: b76Put, d1, d2 } = black76({ F, K, T, r, sigma });
   const { call: amCall, put: amPut } = binomialFuturesOption({
@@ -202,15 +227,71 @@ export default function FuturesOptionScreen() {
           />
         </View>
 
-        <View style={styles.feld}>
-          <Text style={styles.label}>Volatilität σ pro Jahr (%)</Text>
-          <TextInput
-            style={styles.input}
-            value={volatilitaet}
-            onChangeText={setVolatilitaet}
-            keyboardType="decimal-pad"
-          />
+        <View style={styles.modusUmschalter}>
+          <Pressable
+            style={[
+              styles.modusButton,
+              modus === 'vola' && styles.modusButtonAktiv,
+            ]}
+            onPress={() => setModus('vola')}
+          >
+            <Text
+              style={[
+                styles.modusText,
+                modus === 'vola' && styles.modusTextAktiv,
+              ]}
+            >
+              Vola eingeben
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modusButton,
+              modus === 'marktpreis' && styles.modusButtonAktiv,
+            ]}
+            onPress={() => setModus('marktpreis')}
+          >
+            <Text
+              style={[
+                styles.modusText,
+                modus === 'marktpreis' && styles.modusTextAktiv,
+              ]}
+            >
+              Marktpreis → Vola
+            </Text>
+          </Pressable>
         </View>
+
+        {modus === 'vola' ? (
+          <View style={styles.feld}>
+            <Text style={styles.label}>Volatilität σ pro Jahr (%)</Text>
+            <TextInput
+              style={styles.input}
+              value={volatilitaet}
+              onChangeText={setVolatilitaet}
+              keyboardType="decimal-pad"
+            />
+          </View>
+        ) : (
+          <View style={styles.feld}>
+            <Text style={styles.label}>
+              Marktpreis ({optionsTyp === 'call' ? 'Call' : 'Put'}, USD)
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={marktpreis}
+              onChangeText={setMarktpreis}
+              keyboardType="decimal-pad"
+            />
+            {implizierteVolaFehler ? (
+              <Text style={styles.hinweisFehler}>{implizierteVolaFehler}</Text>
+            ) : (
+              <Text style={styles.hinweisErgebnis}>
+                Implizite Volatilität: {(sigma * 100).toFixed(2)} %
+              </Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.feld}>
           <View style={styles.labelZeile}>
@@ -337,6 +418,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#b3261e',
     marginTop: 6,
+  },
+  hinweisErgebnis: {
+    fontSize: 13,
+    color: '#0a7ea4',
+    fontWeight: '600',
+    marginTop: 6,
+  },
+  modusUmschalter: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  modusButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  modusButtonAktiv: {
+    backgroundColor: '#eef7fb',
+  },
+  modusText: {
+    fontSize: 13,
+    color: '#666',
+  },
+  modusTextAktiv: {
+    color: '#0a7ea4',
+    fontWeight: '700',
   },
   input: {
     borderWidth: 1,
