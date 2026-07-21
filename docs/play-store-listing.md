@@ -66,3 +66,14 @@ stephan@hink.de
 https://stephanhink.github.io/finanz-kids/datenschutz.html
 (passe den Pfad an, falls GitHub Pages unter einer anderen URL läuft —
 prüfen unter Repo-Settings → Pages)
+
+## Grafiken
+
+- **App-Icon** (Store-Eintrag, 512×512, 32-Bit PNG): `docs/store-assets/app-icon-512.png`
+- **Vorstellungsgraphik** (Feature Graphic, 1024×500, PNG ohne Alpha): `docs/store-assets/feature-graphic.png`
+- **Screenshots**: `docs/screenshots/screenshot-1.jpg` bis `screenshot-3.jpg`
+
+Das eigentliche App-Icon (Startbildschirm-Symbol) liegt in `assets/icon.png`
+und den `assets/android-icon-*.png`-Dateien und wird beim nächsten Build
+automatisch mit eingebaut — dafür also kein separater Upload nötig, nur
+ein neuer Build über den GitHub-Actions-Workflow.
