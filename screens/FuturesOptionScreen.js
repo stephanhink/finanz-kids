@@ -11,20 +11,13 @@ import {
   View,
 } from 'react-native';
 
-import VerfallsdatumFeld from '../components/VerfallsdatumFeld';
+import KontraktAuswahl from '../components/KontraktAuswahl';
 import { black76 } from '../utils/black76';
 import { binomialFuturesOption } from '../utils/binomialFutures';
 import { tageBisDatum } from '../utils/datum';
+import { naechsteKontrakte } from '../utils/nymexKontrakte';
 import { holeKurs } from '../utils/yahooFinance';
 import { holeUsZinskurve, interpoliereZins } from '../utils/zinskurve';
-
-const WTI_TICKER = 'CL=F'; // WTI Crude Oil Future, NYMEX
-
-function datumInTagen(tageAbHeute) {
-  const datum = new Date();
-  datum.setDate(datum.getDate() + tageAbHeute);
-  return datum;
-}
 
 function zahl(text) {
   return parseFloat(text.replace(',', '.')) || 0;
@@ -39,9 +32,11 @@ function formatUsd(zahl) {
 }
 
 export default function FuturesOptionScreen() {
+  const [kontrakte] = useState(() => naechsteKontrakte(24));
+  const [kontrakt, setKontrakt] = useState(kontrakte[0]);
+
   const [futuresPreis, setFuturesPreis] = useState('80');
   const [basispreis, setBasispreis] = useState('80');
-  const [verfallsdatum, setVerfallsdatum] = useState(datumInTagen(60));
   const [volatilitaet, setVolatilitaet] = useState('35');
   const [zinssatz, setZinssatz] = useState('4');
   const [optionsTyp, setOptionsTyp] = useState('call');
@@ -52,20 +47,20 @@ export default function FuturesOptionScreen() {
   const [zinsLaedt, setZinsLaedt] = useState(false);
   const [zinsFehler, setZinsFehler] = useState(null);
 
-  async function ladeWtiKurs() {
+  async function ladeWtiKurs(ticker) {
     setWtiLaedt(true);
     setWtiFehler(null);
     try {
-      const kurs = await holeKurs(WTI_TICKER);
+      const kurs = await holeKurs(ticker);
       setFuturesPreis(kurs.toFixed(2));
     } catch (fehler) {
-      setWtiFehler('WTI-Kurs konnte nicht geladen werden — bitte manuell eingeben.');
+      setWtiFehler('Kurs konnte nicht geladen werden — bitte manuell eingeben.');
     } finally {
       setWtiLaedt(false);
     }
   }
 
-  const tageBisVerfall = tageBisDatum(verfallsdatum);
+  const tageBisVerfall = tageBisDatum(kontrakt.verfallsdatum);
 
   async function ladeZinskurve() {
     setZinsLaedt(true);
@@ -84,8 +79,14 @@ export default function FuturesOptionScreen() {
     }
   }
 
+  // Bei jedem Kontraktwechsel den passenden Kurs neu laden — der Preis
+  // muss immer zum gewählten Liefermonat passen, sonst wäre die
+  // Bewertung mit falschem Basiswert.
   useEffect(() => {
-    ladeWtiKurs();
+    ladeWtiKurs(kontrakt.ticker);
+  }, [kontrakt]);
+
+  useEffect(() => {
     ladeZinskurve();
   }, []);
 
@@ -161,6 +162,13 @@ export default function FuturesOptionScreen() {
           </Pressable>
         </View>
 
+        <KontraktAuswahl
+          label={`Kontraktmonat (${tageBisVerfall} Tage bis Options-Verfall)`}
+          kontrakt={kontrakt}
+          kontrakte={kontrakte}
+          onAendern={setKontrakt}
+        />
+
         <View style={styles.feld}>
           <View style={styles.labelZeile}>
             <Text style={styles.label}>Futures-Preis F (USD/Barrel)</Text>
@@ -175,9 +183,10 @@ export default function FuturesOptionScreen() {
           {wtiFehler ? (
             <Text style={styles.hinweisFehler}>{wtiFehler}</Text>
           ) : (
-            <Pressable onPress={ladeWtiKurs}>
+            <Pressable onPress={() => ladeWtiKurs(kontrakt.ticker)}>
               <Text style={styles.hinweisLink}>
-                aktuellen WTI-Kurs (CL=F, Yahoo Finance) neu laden
+                aktuellen Kurs für {kontrakt.ticker} ({kontrakt.label}, Yahoo
+                Finance) neu laden
               </Text>
             </Pressable>
           )}
@@ -192,12 +201,6 @@ export default function FuturesOptionScreen() {
             keyboardType="decimal-pad"
           />
         </View>
-
-        <VerfallsdatumFeld
-          label={`Verfallsdatum (${tageBisVerfall} Tage)`}
-          wert={verfallsdatum}
-          onAendern={setVerfallsdatum}
-        />
 
         <View style={styles.feld}>
           <Text style={styles.label}>Volatilität σ pro Jahr (%)</Text>
