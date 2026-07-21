@@ -77,3 +77,72 @@ Das eigentliche App-Icon (Startbildschirm-Symbol) liegt in `assets/icon.png`
 und den `assets/android-icon-*.png`-Dateien und wird beim nächsten Build
 automatisch mit eingebaut — dafür also kein separater Upload nötig, nur
 ein neuer Build über den GitHub-Actions-Workflow.
+
+---
+
+# Play Store listing: Finanz-Kids (English)
+
+For the English locale in Play Console (App content → Store listing).
+
+## App name
+
+Finanz-Kids
+
+## Short description (max. 80 characters)
+
+Learn compound interest, stock options & WTI futures with real models.
+
+## Full description (max. 4000 characters)
+
+Finanz-Kids brings the math behind interest, stock options, and crude oil
+futures to life — using the same models real financial markets use.
+
+Three calculators, one goal: understand how financial products are
+actually priced, not just memorize formulas.
+
+COMPOUND INTEREST CALCULATOR
+Enter starting capital, monthly contribution, interest rate, and term —
+instantly see how powerful compound interest becomes over the years.
+
+STOCK OPTIONS (BLACK-SCHOLES-MERTON)
+The classic option pricing model: enter stock price, strike price, time
+to expiry, volatility, and dividend yield to calculate the fair call or
+put price — including the intermediate values d1 and d2 for anyone who
+wants to go deeper. The risk-free rate is automatically suggested from
+the current US Treasury yield curve.
+
+FUTURES OPTIONS (WTI CRUDE OIL, NYMEX)
+Price options on WTI crude oil using the Black-76 model — plus a
+binomial tree (Cox-Ross-Rubinstein) for American-style early exercise,
+exactly as traded on the NYMEX. The current futures price loads live,
+and the "early exercise premium" shows the difference between both
+models directly.
+
+WHO IS THIS APP FOR?
+For students and anyone looking for a hands-on, tangible introduction to
+financial valuation — no background in stochastic calculus required, but
+built on the real formulas instead of oversimplified approximations.
+
+PRIVACY
+Finanz-Kids collects no personal data whatsoever. No user accounts, no
+ads, no in-app purchases, no tracking. Inputs stay temporarily on your
+device only.
+
+DISCLAIMER
+This app is for educational and demonstration purposes only. Calculated
+values are model outputs and do not constitute investment or financial
+advice.
+
+## Category
+
+Education
+
+## Contact email
+
+stephan@hink.de
+
+## Privacy policy URL
+
+https://stephanhink.github.io/finanz-kids/datenschutz.html
+(same URL as the German listing — the privacy policy page itself is
+German-only for now; let me know if you'd like an English version too)
