@@ -27,6 +27,12 @@
     },
     "plugins": [
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c45dce56-8f10-41a3-9033-a1a562b766e1"
+      }
+    },
+    "owner": "heilpraktikerdk"
   }
 }
