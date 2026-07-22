@@ -146,15 +146,17 @@ export default function HypothekenScreen() {
         </View>
 
         <View style={styles.feld}>
-          <Text style={styles.label}>
-            Zinssatz nach Zinsbindung, z. B. bei einer Zinssteigerung (%)
-          </Text>
+          <Text style={styles.label}>Neuer Zinssatz nach Zinsbindung (%)</Text>
           <TextInput
             style={styles.input}
             value={neuerZinssatz}
             onChangeText={setNeuerZinssatz}
             keyboardType="decimal-pad"
           />
+          <Text style={styles.hinweis}>
+            Der neue Zinssatz insgesamt, nicht die Erhöhung — z. B. "6" für
+            6 % p.a., auch wenn der bisherige Zins niedriger war
+          </Text>
         </View>
 
         <View style={styles.ergebnisWarnung}>
@@ -239,6 +241,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
+  },
+  hinweis: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 6,
   },
   ergebnis: {
     marginTop: 8,
