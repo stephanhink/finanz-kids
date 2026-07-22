@@ -5,6 +5,7 @@ import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import ZinsRechnerScreen from './screens/ZinsRechnerScreen';
 import AktienOptionScreen from './screens/AktienOptionScreen';
 import FuturesOptionScreen from './screens/FuturesOptionScreen';
+import HypothekenScreen from './screens/HypothekenScreen';
 
 // Jeder Tab bekommt einen Schlüssel, ein Label für die Tab-Leiste und
 // die Screen-Komponente, die angezeigt wird. Ein neuer Rechner
@@ -14,6 +15,7 @@ const TABS = [
   { key: 'zinsen', label: 'Zinsen', Screen: ZinsRechnerScreen },
   { key: 'aktienoptionen', label: 'Aktienoptionen', Screen: AktienOptionScreen },
   { key: 'futures', label: 'Futures', Screen: FuturesOptionScreen },
+  { key: 'hypothek', label: 'Hypothek', Screen: HypothekenScreen },
 ];
 
 export default function App() {
