@@ -29,15 +29,21 @@ export function laufzeitInMonaten({ kreditbetrag, zinssatz, rate }) {
   return -Math.log(1 - (kreditbetrag * im) / rate) / Math.log(1 + im);
 }
 
-// Jahresweiser Tilgungsplan für die angegebene Anzahl Jahre.
+// Jahresweiser Tilgungsplan für die angegebene Anzahl Jahre. Neben der
+// Restschuld auch die bis dahin insgesamt gezahlten Zinsen und die
+// insgesamt getilgte Summe — die getilgte Summe ergibt sich direkt aus
+// dem Rückgang der Restschuld, der Rest der gezahlten Raten war Zins.
 export function tilgungsplan({ kreditbetrag, zinssatz, rate }, jahre) {
   const plan = [];
   for (let jahr = 1; jahr <= jahre; jahr++) {
+    const monate = jahr * 12;
     const restschuld = restschuldNachMonaten(
       { kreditbetrag, zinssatz, rate },
-      jahr * 12
+      monate
     );
-    plan.push({ jahr, restschuld });
+    const kumulierteTilgung = kreditbetrag - restschuld;
+    const kumulierteZinsen = rate * monate - kumulierteTilgung;
+    plan.push({ jahr, restschuld, kumulierteZinsen, kumulierteTilgung });
   }
   return plan;
 }

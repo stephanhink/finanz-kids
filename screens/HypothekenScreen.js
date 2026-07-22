@@ -175,15 +175,30 @@ export default function HypothekenScreen() {
           <Text style={styles.detailsTitel}>
             Restschuld im Zeitverlauf (während der Zinsbindung)
           </Text>
+          <Text style={styles.detailsHinweis}>
+            Zinsen und Tilgung jeweils kumuliert seit Kreditbeginn
+          </Text>
           <View style={styles.tabelleKopf}>
-            <Text style={styles.tabelleKopfZelle}>Jahr</Text>
+            <Text style={[styles.tabelleKopfZelle, styles.tabelleJahrSpalte]}>
+              Jahr
+            </Text>
             <Text style={styles.tabelleKopfZelle}>Restschuld</Text>
+            <Text style={styles.tabelleKopfZelle}>Zinsen</Text>
+            <Text style={styles.tabelleKopfZelle}>Tilgung</Text>
           </View>
           {plan.map((eintrag) => (
             <View key={eintrag.jahr} style={styles.tabelleZeile}>
-              <Text style={styles.tabelleZelle}>{eintrag.jahr}</Text>
+              <Text style={[styles.tabelleZelle, styles.tabelleJahrSpalte]}>
+                {eintrag.jahr}
+              </Text>
               <Text style={styles.tabelleZelle}>
                 {formatEuro(eintrag.restschuld)}
+              </Text>
+              <Text style={styles.tabelleZelle}>
+                {formatEuro(eintrag.kumulierteZinsen)}
+              </Text>
+              <Text style={styles.tabelleZelle}>
+                {formatEuro(eintrag.kumulierteTilgung)}
               </Text>
             </View>
           ))}
@@ -274,6 +289,11 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 2,
   },
+  detailsHinweis: {
+    fontSize: 11,
+    color: '#888',
+    marginBottom: 8,
+  },
   tabelleKopf: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -283,7 +303,7 @@ const styles = StyleSheet.create({
   },
   tabelleKopfZelle: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#666',
   },
@@ -293,7 +313,10 @@ const styles = StyleSheet.create({
   },
   tabelleZelle: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 12,
     color: '#444',
+  },
+  tabelleJahrSpalte: {
+    flex: 0.5,
   },
 });
